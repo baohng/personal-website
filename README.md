@@ -28,10 +28,18 @@ npm install
 
 ### 3. Apply the schema
 
-Open Supabase SQL editor and run `supabase/migrations/0001_init.sql`. Then run:
+Open Supabase SQL editor and run, in order:
+
+1. `supabase/migrations/0001_init.sql`
+2. `supabase/migrations/0002_admin_email_table.sql`
+
+Then set the admin email:
 
 ```sql
-alter database postgres set app.admin_email = 'you@example.com';
+insert into public.app_config (id, admin_email)
+values (true, 'you@example.com')
+on conflict (id) do update set admin_email = excluded.admin_email,
+                                updated_at = now();
 ```
 
 (replace with the email you want to use for admin login).
