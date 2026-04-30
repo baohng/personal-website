@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/image-upload-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { TechnicalSkill } from "@/lib/types";
@@ -65,13 +66,12 @@ export function SkillForm({ skill }: { skill?: TechnicalSkill }) {
             defaultValue={skill?.display_order ?? 0}
           />
         </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="icon_url">Icon URL</Label>
-          <Input
+        <div className="sm:col-span-2">
+          <ImageUploadField
             id="icon_url"
             name="icon_url"
-            type="url"
-            defaultValue={skill?.icon_url ?? ""}
+            label="Icon"
+            defaultValue={skill?.icon_url}
           />
         </div>
       </div>

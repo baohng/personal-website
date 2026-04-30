@@ -4,6 +4,7 @@ import * as React from "react";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/image-upload-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -93,14 +94,14 @@ export function ProjectForm({ project }: { project?: Project }) {
             defaultValue={project?.demo_url ?? ""}
           />
         </Field>
-        <Field label="Cover image URL" htmlFor="cover_image_url">
-          <Input
+        <div className="sm:col-span-2">
+          <ImageUploadField
             id="cover_image_url"
             name="cover_image_url"
-            type="url"
-            defaultValue={project?.cover_image_url ?? ""}
+            label="Cover image"
+            defaultValue={project?.cover_image_url}
           />
-        </Field>
+        </div>
         <Field
           label="Tech stack (comma-separated)"
           htmlFor="tech_stack"
