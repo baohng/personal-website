@@ -9,6 +9,7 @@ import { contactMessageSchema } from "@/lib/schemas";
 export type ContactState = {
   error: string | null;
   success: boolean;
+  submittedAt: number;
 };
 
 export async function sendContactMessageAction(
@@ -21,17 +22,24 @@ export async function sendContactMessageAction(
     message: formData.get("message") ?? "",
   });
 
+  const submittedAt = Date.now();
+
   if (!parsed.success) {
     return {
       error: parsed.error.issues[0]?.message ?? "Invalid input",
       success: false,
+      submittedAt,
     };
   }
 
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_TO_EMAIL;
   if (!apiKey || !to) {
-    return { error: "Email service is not configured.", success: false };
+    return {
+      error: "Email service is not configured.",
+      success: false,
+      submittedAt,
+    };
   }
 
   const resend = new Resend(apiKey);
@@ -46,8 +54,12 @@ export async function sendContactMessageAction(
   });
 
   if (error) {
-    return { error: error.message ?? "Failed to send message.", success: false };
+    return {
+      error: error.message ?? "Failed to send message.",
+      success: false,
+      submittedAt,
+    };
   }
 
-  return { error: null, success: true };
+  return { error: null, success: true, submittedAt };
 }

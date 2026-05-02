@@ -1,15 +1,23 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import { sendContactMessageAction, type ContactState } from "./actions";
 
-const INITIAL: ContactState = { error: null, success: false };
+const INITIAL: ContactState = { error: null, success: false, submittedAt: 0 };
 
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(
@@ -17,12 +25,24 @@ export function ContactForm() {
     INITIAL,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const [dialog, setDialog] = useState<
+    | { open: false }
+    | { open: true; kind: "success" | "error"; message: string }
+  >({ open: false });
 
   useEffect(() => {
+    if (!state.submittedAt) return;
     if (state.success) {
       formRef.current?.reset();
+      setDialog({
+        open: true,
+        kind: "success",
+        message: "Thanks for reaching out! I'll get back to you soon.",
+      });
+    } else if (state.error) {
+      setDialog({ open: true, kind: "error", message: state.error });
     }
-  }, [state.success]);
+  }, [state.submittedAt, state.success, state.error]);
 
   return (
     <form ref={formRef} action={formAction} className="space-y-4">
@@ -57,17 +77,31 @@ export function ContactForm() {
           maxLength={5000}
         />
       </div>
-      {state.error ? (
-        <p className="text-sm text-destructive">{state.error}</p>
-      ) : null}
-      {state.success ? (
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">
-          Thanks! Your message has been sent.
-        </p>
-      ) : null}
       <Button type="submit" disabled={pending}>
         {pending ? "Sending..." : "Send message"}
       </Button>
+      <Dialog
+        open={dialog.open}
+        onOpenChange={(open) => {
+          if (!open) setDialog({ open: false });
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {dialog.open && dialog.kind === "success"
+                ? "Message sent"
+                : "Something went wrong"}
+            </DialogTitle>
+            <DialogDescription>
+              {dialog.open ? dialog.message : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setDialog({ open: false })}>OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }
