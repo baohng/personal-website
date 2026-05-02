@@ -82,3 +82,11 @@ export const skillSchema = z.object({
 });
 
 export type SkillInput = z.infer<typeof skillSchema>;
+
+export const contactMessageSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Invalid email").max(200),
+  message: z.string().trim().min(10, "Message must be at least 10 characters").max(5000),
+});
+
+export type ContactMessageInput = z.infer<typeof contactMessageSchema>;
